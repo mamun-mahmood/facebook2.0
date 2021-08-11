@@ -49,8 +49,6 @@ const StoryReel = () => {
             {
                 stories.map( story => <Story key = {story.id} data = {story}></Story>)
             }
-            {/* <Story className='storyReel' title='Elon Musk' image='https://techcrunch.com/wp-content/uploads/2019/04/falcon-heavy-spacex-rocket.jpg' profileSrc='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVTFpsgcrxvZ2t6P4PCWdVpiQlp_HxMunNzw&usqp=CAU' /> */}
-
         </div>
     );
 };

@@ -11,9 +11,13 @@ import swal from 'sweetalert';
 import { useState } from 'react';
 import { useStateValue } from './StateProvider';
 import firebase from 'firebase';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+
 const Post = (props) => {
     const [{ user }] = useStateValue();
-    const { image, timestamp, message, photoURL, displayName, likes, likersEmail } = props.data.data
+    const { image, timestamp, message, photoURL, displayName, likersEmail, comments, posterEmail } = props.data.data
     const handlePostMenu = (event) => {
         setAnchorEl(event.currentTarget);
     }
@@ -48,68 +52,129 @@ const Post = (props) => {
             });
     }
     const [like, setLike] = useState(false)
-    console.log(like);
     const handleLike = (id) => {
         like ? db.collection("posts").doc(id).update({
-            likes: likes - 1,
             likersEmail: firebase.firestore.FieldValue.arrayRemove(user.email)
         })
             : db.collection("posts").doc(id).update({
-                likes: likes + 1,
                 likersEmail: firebase.firestore.FieldValue.arrayUnion(user.email)
             });
         setLike(!like)
     }
-            return (
-                <div className="post">
-                    <div className="post_top">
-                        <Avatar src={photoURL}
-                            className="post_avatar" />
-                        <div className="post_topInfo">
-                            <h3>{displayName}</h3>
-                            <p>{new Date(timestamp?.toDate()).toUTCString()}</p>
-                        </div>
-                        <IconButton style={{ marginLeft: 'auto' }} onClick={handlePostMenu}>
-                            <MoreVertIcon />
-                        </IconButton>
-                        <div>
-                            <Menu
-                                id="fade-menu"
-                                anchorEl={anchorEl}
-                                keepMounted
-                                open={open}
-                                onClose={handleClose}
-                                TransitionComponent={Fade}
-                            >
-                                <MenuItem onClick={handleClose}>Edit</MenuItem>
-                                <MenuItem onClick={handleClose}>Privacy</MenuItem>
-                                <MenuItem onClick={() => handleDelete(props.data.id)}>Delete</MenuItem>
-                            </Menu>
-                        </div>
-                    </div>
-                    <div className="post_bottom">
-                        <p>{message}</p>
-                    </div>
-                    <div className="post_image">
-                        <img src={image} alt="" />
-                    </div>
-                    <div className="post-options">
-                        <div className="post-option" onClick={() => handleLike(props.data.id)}
-                            style={{ color: `${likersEmail.find(e => e ===  user.email ) ? '#2e81f4' : 'red'}` }}
-                        >
-                            <ThumbUp />
-                            <p>{likes > 0 && likes} Like<span style={{ display: `${likes < 2 && 'none'}` }}>s</span></p>
-                        </div>
-                        <div className="post-option">
-                            <ChatBubbleOutline />
-                            <p>Comment</p>
-                        </div>
-                        <div className="post-option">
-                            <NearMeOutlined />
-                            <p>Share</p>
-                        </div>
-                    </div>
+    const MySwal = withReactContent(Swal)
+    const handleEdit = (data, id) => {
+        handleClose()
+        MySwal.fire({
+            title: 'Edit your post:',
+            input: 'text',
+            inputValue: data,
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!'
+                }
+                else {
+                    db.collection("posts").doc(id).update({
+                        message: value,
+                    })
+                }
+            }
+        })
+    }
+    const handleComments = (id) => {
+        MySwal.fire({
+            title: 'Write a comment:',
+            input: 'text',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!'
+                }
+                else {
+                    db.collection("posts").doc(id).update({
+                        comments: firebase.firestore.FieldValue.arrayUnion(value)
+                    })
+                }
+
+            }
+        })
+    }
+    const handleImg = () => {
+        Swal.fire({
+            title: displayName,
+            text: message,
+            imageUrl: image,
+            imageWidth: 2000,
+            imageHeight: 600,
+            imageAlt: 'Custom image',
+        })
+    }
+    const handleAllComments = () => {
+
+    }
+    return (
+        <div className="post">
+            <div className="post_top">
+                <Avatar src={photoURL}
+                    className="post_avatar" />
+                <div className="post_topInfo">
+                    <h3>{displayName}</h3>
+                    <p>{new Date(timestamp?.toDate()).toUTCString()}</p>
                 </div>
-            );
-        };
-    export default Post;
+                <IconButton style={{ marginLeft: 'auto' }} onClick={handlePostMenu}>
+                    <MoreVertIcon />
+                </IconButton>
+                <div>
+                    <Menu
+                        id="fade-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={open}
+                        onClose={handleClose}
+                        TransitionComponent={Fade}
+                    >
+                        <div style={{ display: `${posterEmail === user.email ? 'block' : 'none'}` }}>
+                            <MenuItem onClick={() => handleEdit(message, props.data.id)}>Edit</MenuItem>
+                            <MenuItem onClick={handleClose}>Privacy</MenuItem>
+                            <MenuItem onClick={() => handleDelete(props.data.id)}>Delete</MenuItem>
+                        </div>
+                        <MenuItem onClick={handleClose}>Save</MenuItem>
+                        <MenuItem onClick={handleClose}>Poke</MenuItem>
+                        <MenuItem onClick={handleClose}>Link</MenuItem>
+                    </Menu>
+                </div>
+            </div>
+            <div className="post_bottom">
+                <p>{message}</p>
+            </div>
+            <div className="post_image">
+                <img src={image} alt="" onClick={() => handleImg()} />
+            </div>
+            <div className="comments">
+                <div style={{ display: `${likersEmail.length > 0 ? 'block' : 'none'}` }} className="like both">
+                    <p>{likersEmail.length} Like<span style={{ display: `${likersEmail.length < 2 && 'none'}` }}>s</span></p>
+                </div>
+                <div onClick={() => handleAllComments(props.data.id)} style={{ display: `${comments.length > 0 ? 'block' : 'none'}` }} className="comment both">
+                    <p>{comments.length} Comment<span style={{ display: `${comments.length < 2 && 'none'}` }}>s</span></p>
+                </div>
+            </div>
+            <div className="post-options">
+                <div className="post-option" onClick={() => handleLike(props.data.id)}
+                    style={{ color: `${likersEmail.find(e => e === user.email) ? '#2e81f4' : ''}` }}
+                >
+                    <ThumbUp />
+                    <p>Like</p>
+                </div>
+                <div onClick={() => handleComments(props.data.id)} className="post-option">
+                    <ChatBubbleOutline />
+                    <p>Comment</p>
+                </div>
+                <div className="post-option">
+                    <NearMeOutlined />
+                    <p>Share</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+export default Post;

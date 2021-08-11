@@ -4,7 +4,7 @@ import './Sidebar.css'
 import SidebarRow from './SidebarRow';
 import { useStateValue } from './StateProvider';
 const Sidebar = () => {
-    const [{user}, dispatch] = useStateValue();
+    const [{user}, ] = useStateValue();
     return (
         <div className="sidebar">
             <SidebarRow src={user.photoURL} title={user.displayName} />

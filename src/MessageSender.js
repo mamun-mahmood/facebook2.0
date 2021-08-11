@@ -5,6 +5,7 @@ import { InsertEmoticon, PhotoLibrary, Videocam } from '@material-ui/icons';
 import { useState } from 'react';
 import { useStateValue } from './StateProvider';
 import db from './firebase';
+import { LinearProgress } from '@material-ui/core';
 import firebase from 'firebase'
 import axios from 'axios';
 const MessageSender = () => {
@@ -21,26 +22,26 @@ const MessageSender = () => {
                 image: imgUrl,
                 displayName: user.displayName,
                 photoURL: user.photoURL,
-                likes: 0,
                 likersEmail: [],
+                comments: []
             })
         }
         setInput('');
         setImgUrl('');
     }
+    const [imgLoad, setImgLoad] = useState(false)
     const handleImgUpload = event => {
+        setImgLoad(true)
         const imgData = new FormData();
         imgData.set('key', 'c52ef286d44538b5e35cd23b4743904e');
         imgData.append('image', event.target.files[0]);
-        // setImgLoad(true)
         axios.post('https://api.imgbb.com/1/upload',
             imgData)
             .then(res => {
-                // setImgLoad(false)
+                setImgLoad(false)
                 setImgUrl(res.data.data.display_url)
             })
             .catch(err => {
-                // setImgLoad(false)
                 console.log(err);
             })
     }
@@ -64,6 +65,9 @@ const MessageSender = () => {
                     </button>
                 </form>
             </div>
+            {
+                imgLoad && <LinearProgress color="secondary" />
+            }
             <div className="messageSender_Bottom">
                 <div className="messageSender_option">
                     <Videocam style={{ color: 'red' }} />

@@ -5,16 +5,15 @@ import Feed from './Feed'
 import Widgets from './Widgets';
 import Login from './Login';
 import { useStateValue } from './StateProvider';
-
 function App() {
-  const [{user}, dispatch] = useStateValue();
+  const [{user}, ] = useStateValue();
   return (
     <div className="app">
       {!user ? (
         <Login/>
       ) : (
         <>
-          <Header />
+          {/* <Header /> */}
           <div className="app_body">
             { /* App Body */}
             <Sidebar />

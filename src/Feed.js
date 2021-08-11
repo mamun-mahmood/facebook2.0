@@ -8,7 +8,6 @@ import Post from './Post';
 import StoryReel from './StoryReel';
 const Feed = () => {
     const [post, setPost] = useState([]);
-    // const [like, setLike] = useState(likersEmail.find(e => e === user.email))
     useEffect(() => {
         db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) =>
             setPost(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data()})))
