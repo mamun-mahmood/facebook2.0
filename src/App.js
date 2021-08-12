@@ -13,7 +13,7 @@ function App() {
         <Login/>
       ) : (
         <>
-          {/* <Header /> */}
+          <Header />
           <div className="app_body">
             { /* App Body */}
             <Sidebar />

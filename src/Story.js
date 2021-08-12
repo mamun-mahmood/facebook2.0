@@ -9,8 +9,8 @@ const Story = (props) => {
             title: userName,
             text: new Date(timeStamp?.toDate()).toUTCString(),
             imageUrl: storyImage,
-            imageWidth: 1800,
-            imageHeight: 700,
+            imageWidth: 1000,
+            imageHeight: 500,
             imageAlt: 'Custom image',
             
           })
