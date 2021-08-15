@@ -4,19 +4,18 @@ import db from './firebase';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
-import { InsertEmoticon } from '@material-ui/icons';
-import { LinearProgress } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useStateValue } from './StateProvider';
-import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import './CommentsPage.css'
 import { ChatBubbleOutline, ThumbUp } from '@material-ui/icons';
+import { InsertEmoticon } from '@material-ui/icons';
+import { LinearProgress } from '@material-ui/core';
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import Picker from 'emoji-picker-react';
-import axios from 'axios';
-import firebase from 'firebase';
 import Popover from '@material-ui/core/Popover';
-
-const CommentsPage = ({ id }) => {
+import axios from 'axios';
+import firebase from 'firebase'
+const CommentsPage = ({state, id }) => {
     const handleCommentMenu = (event) => {
         setAnchorEl(event.currentTarget);
     }
@@ -38,7 +37,7 @@ const CommentsPage = ({ id }) => {
         }).catch((error) => {
             console.log("Error getting document:", error);
         });
-    }, [id])
+    })
     const [input, setInput] = useState('')
     const [imgUrl, setImgUrl] = useState('')
     const handleSubmit = (e) => {
@@ -78,117 +77,121 @@ const CommentsPage = ({ id }) => {
     }
     const [openEmoji, setOpenEmoji] = useState(false)
 
-    const onEmojiClick = (event, emojiObject) => {
+    const onEmojiClick = (emojiObject) => {
         const newInput = input.concat(emojiObject.emoji)
         setInput(newInput);
     };
+    const [to, setTo] = useState(3)
+    const slicedComments = comments.slice(0,to)
+    const handleEditComment = (id, data) => {
+        // setInput(data);
+    }
     return (
-        <div className="post">
-            <div style={{ borderTop: '1px solid rgb(175, 175, 175)' }} className="messageSender_top">
-                <Avatar src={user.photoURL} />
-                <form>
-                    <input
-                        placeholder={`Write a comment...`}
-                        className='messageSender_input'
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                    >
-                    </input>
-                    <div className="comment-options">
-                        <label htmlFor="upload_comment">
-                            <div className="comment-option">
-                                <AddAPhotoIcon />
-                            </div>
-                        </label>
-                        <input type="file" onChange={handleImgUpload} id="upload_comment" style={{ display: 'none' }} />
-                        <div className="comment-option" onClick={() => setOpenEmoji(!openEmoji)}>
-                            <InsertEmoticon />
-                        </div>
-                    </div>
-
-                    <button onClick={handleSubmit} type='submit'>
-                        Submit
-                    </button>
-                </form>
-            </div>
-            <Popover
-                open={openEmoji}
-                onClose={() => setOpenEmoji(false)}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-            >   <div>
-                    <Picker onEmojiClick={onEmojiClick} />
-                </div>
-            </Popover>
-            {
-                imgLoad && <LinearProgress />
-            }
-            {
-                comments.map(data =>
-                    <>
-                        <div className="post_top">
-                            <Avatar src={data.photo}
-                                className="post_avatar" />
-                            <div className="post_topInfo comment-area">
-                                <div className="comment-area-top">
-                                    <h3>{data.userName}</h3>
-                                    <IconButton style={{ marginLeft: 'auto' }} onClick={handleCommentMenu}>
-                                        <MoreVertIcon />
-                                    </IconButton>
+                 <div style={{ borderTop: '1px solid rgb(175, 175, 175)', borderRadius: '0' }} className="post">
+                {
+                    slicedComments.map(data =>
+                        <>
+                            <div className="post_top">
+                                <Avatar src={data.photo}
+                                    className="post_avatar" />
+                                <div className="post_topInfo comment-area">
+                                    <div className="comment-area-top">
+                                        <h3>{data.userName}</h3>
+                                        <IconButton style={{ marginLeft: 'auto' }} onClick={handleCommentMenu}>
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                    </div>
+                                    {/* <p>{new Date(timestamp?.toDate()).toUTCString()}</p> */}
+                                    <div>
+                                        <p className="comment-text">{data.comment}</p>
+                                    </div>
+                                    <div className="comment-img">
+                                        <img src={data.commentPhoto} alt="" />
+                                    </div>
+                                    <div style={{ fontSize: 'small', padding: '0px ' }} className="post-options">
+                                        <div title="Like" className="post-option">
+                                            <ThumbUp />
+                                        </div>
+                                        <div title="Reply" className="post-option">
+                                            <ChatBubbleOutline />
+                                        </div>
+                                    </div>
                                 </div>
-                                {/* <p>{new Date(timestamp?.toDate()).toUTCString()}</p> */}
                                 <div>
-                                    <p className="comment-text">{data.comment}</p>
-                                </div>
-                                <div className="comment-img">
-                                    <img src={data.commentPhoto} alt="" />
-                                </div>
-                                <div style={{ fontSize: 'small', padding: '0px ' }} className="post-options">
-                                    <div title="Like" className="post-option">
-                                        <ThumbUp />
-                                    </div>
-                                    <div title="Reply" className="post-option">
-                                        <ChatBubbleOutline />
-                                    </div>
+                                    <Menu
+                                        id="fade-menu"
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={open}
+                                        onClose={handleClose}
+                                        TransitionComponent={Fade}
+                                    >
+                                        {/* <div style={{ display: `${data.posterEmail === user.email ? 'block' : 'block'}` }}> */}
+                                        <MenuItem onClick={() => handleEditComment(id, data.comment)}>Edit</MenuItem>
+                                        <MenuItem >Delete</MenuItem>
+                                        {/* </div> */}
+                                    </Menu>
+    
                                 </div>
                             </div>
-                            <div>
-                                <Menu
-                                    id="fade-menu"
-                                    anchorEl={anchorEl}
-                                    keepMounted
-                                    open={open}
-                                    onClose={handleClose}
-                                    TransitionComponent={Fade}
-                                >
-                                    {/* <div style={{ display: `${data.posterEmail === user.email ? 'block' : 'block'}` }}> */}
-                                    <MenuItem>Edit</MenuItem>
-                                    <MenuItem >Delete</MenuItem>
-                                    {/* </div> */}
-                                </Menu>
-
+                        </>)
+                }
+                {
+                    comments.length > 3 && <div style={{display: `${comments.length <= to ? 'none': 'block'}`}} className="seeMoreBtn">
+                        <button onClick={() => setTo(to+3)}>see more</button>
+                    </div>
+                }
+                {
+                    comments.length <= to && <div  className="seeMoreBtn">
+                        <button onClick={() => setTo(3)}>see less</button>
+                    </div>
+                }
+                <div style={{ borderTop: '1px solid rgb(175, 175, 175)', borderRadius: '10px' }} className="messageSender_top">
+                    <Avatar src={user.photoURL} />
+                    <form>
+                        <input
+                            placeholder={`Write a comment...`}
+                            className='messageSender_input'
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                        >
+                        </input>
+                        <div className="comment-options">
+                            <label htmlFor="upload_comment">
+                                <div className="comment-option">
+                                    <AddAPhotoIcon />
+                                </div>
+                            </label>
+                            <input type="file" onChange={handleImgUpload} id="upload_comment" style={{ display: 'none' }} />
+                            <div className="comment-option" onClick={() => setOpenEmoji(!openEmoji)}>
+                                <InsertEmoticon />
                             </div>
                         </div>
-                    </>)
-            }
-            <div className="post_image">
-                {/* <img src={image} alt="" onClick={() => handleImg()} /> */}
+    
+                        <button onClick={(e) => handleSubmit(e)} type='submit'>
+                            Submit
+                        </button>
+                    </form>
+                <Popover
+                    open={openEmoji}
+                    onClose={() => setOpenEmoji(false)}
+                    anchorOrigin={{
+                        vertical: 'center',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                >   <div>
+                        <Picker onEmojiClick={onEmojiClick} />
+                    </div>
+                </Popover>
+                </div >
+                {
+                    imgLoad && <LinearProgress />
+                }
             </div>
-            <div className="comments">
-                {/* <div style={{ display: `${likersEmail.length > 0 ? 'block' : 'none'}` }} className="like both">
-                    <p>{likersEmail.length} Like<span style={{ display: `${likersEmail.length < 2 && 'none'}` }}>s</span></p>
-                </div>
-                <div onClick={() => handleAllComments(props.data.id)} style={{ display: `${comments.length > 0 ? 'block' : 'none'}` }} className="comment both">
-                    <p>{comments.length} Comment<span style={{ display: `${comments.length < 2 && 'none'}` }}>s</span></p>
-                </div> */}
-            </div>
-        </div>
     );
 };
 

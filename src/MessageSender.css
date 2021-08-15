@@ -32,6 +32,9 @@
     .messageSender_top > form > button {
         display: block;
     }
+    .imgURL {
+        display: none;
+    }
 }
 .messageSender_Bottom {
     display: flex;

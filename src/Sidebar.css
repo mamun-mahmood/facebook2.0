@@ -1,9 +1,12 @@
 .sidebar {
     padding: 25px 10px;
     flex: 0.33;
-    position:sticky;
 }
-@media (max-width: 1050px) {
+.sidebar-content {
+    position: fixed;
+    overflow-wrap: break-word;
+}
+@media (max-width: 600px) {
     .sidebar {
         display: none;
     }

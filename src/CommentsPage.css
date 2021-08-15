@@ -39,3 +39,13 @@
     font-size: medium;
     padding: 10px;
 }
+.seeMoreBtn > button:hover {
+    background-color: #d1d5df;   
+}
+.seeMoreBtn > button {
+    background-color: transparent;
+    border-radius: 10px;
+    padding: 5px 30px;
+    margin-bottom: 5px;
+    margin-left: 95px;
+}

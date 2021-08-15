@@ -14,8 +14,6 @@ import firebase from 'firebase';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import CommentsPage from './CommentsPage';
-
-
 const Post = (props) => {
     const [{ user }] = useStateValue();
     const { image, timestamp, message, photoURL, displayName, likersEmail, comments, posterEmail } = props.data.data
@@ -83,34 +81,6 @@ const Post = (props) => {
             }
         })
     }
-    
-    const handleComments = (id) => {
-        MySwal.fire({
-            title: 'Write a comment:',
-            input: 'text',
-            showCancelButton: true,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to write something!'
-                }
-                else {
-                    db.collection("posts").doc(id).update({
-                        
-                        comments: firebase.firestore.FieldValue.arrayUnion(
-                            {
-                                comment: value,
-                                userName: user.displayName,
-                                photo: user.photoURL,
-                                posterEmail: user.email,
-                                commentPhoto: '',
-                            }
-                        )
-                    })
-                }
-
-            }
-        })
-    }
     const handleImg = () => {
         Swal.fire({
             title: displayName,
@@ -168,7 +138,7 @@ const Post = (props) => {
                     <div style={{ display: `${likersEmail.length > 0 ? 'block' : 'none'}` }} className="like both">
                         <p>{likersEmail.length} Like<span style={{ display: `${likersEmail.length < 2 && 'none'}` }}>s</span></p>
                     </div>
-                    <div onClick={() => handleAllComments(props.data.id)} style={{ display: `${comments.length > 0 ? 'block' : 'none'}` }} className="comment both">
+                    <div onClick={() => handleAllComments()} style={{ display: `${comments.length > 0 ? 'block' : 'none'}` }} className="comment both">
                         <p>{comments.length} Comment<span style={{ display: `${comments.length < 2 && 'none'}` }}>s</span></p>
                     </div>
                 </div>
@@ -179,7 +149,7 @@ const Post = (props) => {
                         <ThumbUp />
                         <p>Like</p>
                     </div>
-                    <div onClick={() => handleComments(props.data.id)} className="post-option">
+                    <div onClick={() => handleAllComments()} className="post-option">
                         <ChatBubbleOutline />
                         <p>Comment</p>
                     </div>
@@ -189,7 +159,10 @@ const Post = (props) => {
                     </div>
                 </div>
             {
-                commentPageOpen && <CommentsPage id= {props.data.id}></CommentsPage>
+                commentPageOpen && <CommentsPage
+                                    id= {props.data.id}
+                                    state={commentPageOpen}>
+                                    </CommentsPage>
             }
             </div>
         </>

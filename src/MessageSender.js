@@ -56,7 +56,7 @@ const MessageSender = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                     />
-                    <input placeholder="image URL (Optional )"
+                    <input className="imgURL" placeholder="image URL (Optional )"
                         value={imgUrl}
                         onChange={(e) => setImgUrl(e.target.value)}
                     />

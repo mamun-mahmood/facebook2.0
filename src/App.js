@@ -12,8 +12,8 @@ function App() {
       {!user ? (
         <Login/>
       ) : (
-        <>
-          <Header />
+        <div>
+            <Header/>
           <div className="app_body">
             { /* App Body */}
             <Sidebar />
@@ -22,7 +22,7 @@ function App() {
             {/* Widgets */}
             <Widgets />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

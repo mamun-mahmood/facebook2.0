@@ -1,5 +1,6 @@
 .header {
     padding: 15px 20px;
+    margin-bottom: 5px;
     display: flex;
     justify-content: space-between;
     position: sticky;
@@ -63,5 +64,16 @@
     margin-left: 10px;
 }
 .header_right {
-    display: flex;
+    display: flex
+    ;
+}
+@media (max-width: 1050px) {
+    .header_center {
+        display: none;
+    }
+}
+@media (max-width: 600px) {
+    .header_info {
+        display: none;
+    }
 }
